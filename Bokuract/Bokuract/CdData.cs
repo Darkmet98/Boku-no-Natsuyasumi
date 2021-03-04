@@ -19,21 +19,22 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using Libgame;
-using Mono.Addins;
-using Libgame.IO;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.CompilerServices;
+using Yarhl.FileFormat;
+using Yarhl.FileSystem;
+using Yarhl.IO;
 
 namespace Bokuract
 {
-	[Extension]
-	public class CdData : Format
+    public class CdData : IFormat
 	{
-		public override string FormatName { get { return "Boku1.DIF_DATA"; } }
+		public string FormatName { get { return "Boku1.DIF_DATA"; } }
 
 		public GameFolder Root { get; private set; }
 
-		public override void Read(DataStream strIn)
+		public void Read(DataStream strIn)
 		{
 			CdIndex index = (CdIndex)File.Dependencies["cdimg.idx"].Format;
 
@@ -43,7 +44,7 @@ namespace Bokuract
 				GiveFormat(entries, this.File);
 		}
 
-		private void GiveFormat(Queue<CdIndexEntry> entries, FileContainer folder)
+		private void GiveFormat(Queue<CdIndexEntry> entries, Node folder)
 		{
 			CdIndexEntry entry = entries.Dequeue();
 			if (!entry.IsFolder) {
@@ -61,25 +62,6 @@ namespace Bokuract
 			for (int i = 0; i < entry.SubEntries - 1; i++)
 				GiveFormat(entries, currFolder);
 		}
-
-		public override void Write(DataStream strOut)
-		{
-			throw new NotImplementedException();
-		}
-
-		public override void Export(params DataStream[] strOut)
-		{
-			throw new NotImplementedException();
-		}
-
-		public override void Import(params DataStream[] strIn)
-		{
-			throw new NotImplementedException();
-		}
-
-		protected override void Dispose(bool freeManagedResourcesAlso)
-		{
-		}
-	}
+    }
 }
 
